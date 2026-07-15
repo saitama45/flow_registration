@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+/* Attention blink for a high vulnerable share (>= 33.3%): the percentage and
+   rating pulse red <-> amber to draw the eye. Falls back to a static red when
+   the viewer prefers reduced motion. */
+@keyframes vuln-blink {
+  0%,
+  45% {
+    color: #dc2626; /* red-600 */
+  }
+  55%,
+  100% {
+    color: #f59e0b; /* amber-500 */
+  }
+}
+
+.animate-vuln-blink {
+  animation: vuln-blink 1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-vuln-blink {
+    animation: none;
+    color: #dc2626;
+  }
+}
