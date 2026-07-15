@@ -10,7 +10,7 @@ const INITIAL_FORM = {
   birthdate: '',
   nickname: '',
   address: '',
-  venue: VENUES[0],
+  venue: 'Victory Pasig (Estancia Mall, Pasig City)',
   website: '', // honeypot — humans never see or fill this
 };
 
@@ -80,7 +80,7 @@ export default function RegistrationForm() {
     try {
       // Guarantee a venue even if state was somehow cleared (e.g. a stale
       // hot-reload) — the dropdown always shows the first venue by default.
-      const payload = { ...form, venue: form.venue || VENUES[0] };
+      const payload = { ...form, venue: form.venue || INITIAL_FORM.venue };
       const { ok, data } = await submitRegistration(payload);
       if (ok) {
         setForm(INITIAL_FORM);
