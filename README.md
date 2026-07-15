@@ -92,6 +92,29 @@ automatically (poll every 4s) — no manual refresh.
 > Port note: 5174 is used (not Vite's default 5173) so this app can run
 > alongside the ghelpdesk project's Vite dev server without a port clash.
 
+## Deploy to a public URL (one service, free)
+
+In production the Express server also serves the built React app, so the whole
+thing lives behind **one URL** — no separate frontend host, no CORS to set up.
+
+**Render.com (recommended, free, uses `render.yaml`):**
+
+1. Push to GitHub (done: `github.com/saitama45/flow_registration`).
+2. https://render.com → sign in with GitHub → **New → Blueprint** → pick this repo.
+3. Render reads `render.yaml`. Add the three secret env vars when prompted (from
+   your `server/.env`): `GOOGLE_SPREADSHEET_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`,
+   and `GOOGLE_PRIVATE_KEY` (paste the full key, keeping the `\n` sequences).
+4. Deploy. Public URL: `https://flow-registration.onrender.com` (name may vary).
+
+Build = `npm install --prefix client && npm run build --prefix client && npm install --prefix server`;
+start = `node server/server.js`. The same setup works on Railway or Fly.io.
+
+> Free Render web services sleep after ~15 min idle and cold-start in ~30–60s
+> on the next visit — fine for a demo, worth the paid tier for event day.
+
+> **Before going public, read the auth note below.** The employee list is
+> currently open to anyone with the URL.
+
 ## Security measures
 
 | Layer | Where | What it does |

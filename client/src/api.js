@@ -1,8 +1,15 @@
 /**
  * api.js — the only place the frontend talks to the backend.
  * The browser never touches Google Sheets or any credential.
+ *
+ * URL resolution:
+ *   - VITE_API_URL set  → use it (for a separate-host backend deploy).
+ *   - production build   → '' (relative, same origin: the Express server
+ *                          serves this built app, so /api/... works directly).
+ *   - dev                → http://localhost:5000 (Vite on 5174, API on 5000).
  */
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL =
+  import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? '' : 'http://localhost:5000');
 
 /** Submit a registration. Returns the parsed JSON response. */
 export async function submitRegistration(formData) {

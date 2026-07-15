@@ -16,6 +16,8 @@
  */
 require('dotenv').config();
 
+const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -35,7 +37,24 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ---- Global hardening ------------------------------------------------
-app.use(helmet());
+// CSP tuned for the built React SPA this server also serves: same-origin
+// scripts/styles/images only (plus inline styles, which Vite may emit, and
+// data: images). Everything stays first-party — no third-party origins.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:'],
+        connectSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+      },
+    },
+  })
+);
 app.disable('x-powered-by');
 
 // CORS: strictly allow only the React frontend origin (no wildcard).
@@ -185,7 +204,23 @@ app.patch('/api/employees/:row/asked', writeLimiter, async (req, res) => {
 // Simple liveness probe (no auth, no data).
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
-// Catch-all 404 for anything else under /api.
+// ---- Serve the built React app (single-service deploy) ---------------
+// When a production build exists at client/dist, this server also serves it,
+// so the whole app lives behind ONE public URL (API under /api, the SPA
+// everywhere else). In dev the frontend is served by Vite instead, so this
+// is a no-op until you run `npm run build` in client/.
+const clientDist = path.join(__dirname, '..', 'client', 'dist');
+if (fs.existsSync(path.join(clientDist, 'index.html'))) {
+  app.use(express.static(clientDist));
+  // SPA fallback: any non-API GET returns index.html so client-side routes
+  // (/dashboard, /employee_list) work on direct load / refresh.
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next();
+    return res.sendFile(path.join(clientDist, 'index.html'));
+  });
+}
+
+// Catch-all 404 for anything unmatched (unknown /api routes, etc.).
 app.use((req, res) => res.status(404).json({ success: false, message: 'Not found.' }));
 
 // ---- Startup ---------------------------------------------------------

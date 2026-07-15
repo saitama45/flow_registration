@@ -1,0 +1,32 @@
+# Render.com blueprint — one free web service that builds the React app and
+# serves it together with the API behind a single public URL.
+#
+# To deploy:
+#   1. Push this repo to GitHub (already done).
+#   2. On https://render.com → New → Blueprint → connect this repo.
+#   3. Render reads this file and creates the service. Before the first deploy
+#      finishes, add the secret env vars below (marked sync: false) in the
+#      dashboard: GOOGLE_SPREADSHEET_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL,
+#      GOOGLE_PRIVATE_KEY (paste the full key, keeping the \n sequences).
+#   4. Deploy. Your public URL will be https://<service-name>.onrender.com
+#
+# No REACT_APP_URL / CORS is needed: the frontend is same-origin with the API.
+services:
+  - type: web
+    name: flow-registration
+    runtime: node
+    plan: free
+    # Install both apps, build the client, then the server serves client/dist.
+    buildCommand: npm install --prefix client && npm run build --prefix client && npm install --prefix server
+    startCommand: node server/server.js
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: GOOGLE_SHEET_NAME
+        value: Sheet1
+      - key: GOOGLE_SPREADSHEET_ID
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_EMAIL
+        sync: false
+      - key: GOOGLE_PRIVATE_KEY
+        sync: false
