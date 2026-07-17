@@ -90,11 +90,11 @@ export default function AdminDashboard() {
           </div>
 
           {/* Vulnerable employees — donut */}
-          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-slate-50 px-4 py-8 text-center ring-1 ring-amber-100">
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-slate-50 px-4 py-8 text-center ring-1 ring-red-100">
             <DonutRing
               value={stats.vulnerableEmployees}
               total={stats.totalEmployees}
-              color="#d97706"
+              color="#dc2626"
               centerLabel={`of ${stats.totalEmployees}`}
             />
             <span className="text-sm font-medium text-slate-500">Vulnerable employees</span>
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
 
         {/* Which optional details people chose to share — one bar per field.
             Same measure across three categories, so they share one colour. */}
-        <div className="rounded-2xl bg-slate-50 px-6 py-6 ring-1 ring-amber-100">
+        <div className="rounded-2xl bg-slate-50 px-6 py-6 ring-1 ring-red-100">
           <p className="text-sm font-semibold text-slate-700">Employees who shared their…</p>
           <p className="mt-0.5 text-xs text-slate-400">
             Only whether each was provided is recorded — never the values.
@@ -114,21 +114,21 @@ export default function AdminDashboard() {
               value={stats.contactEmployees}
               total={stats.totalEmployees}
               percentage={stats.contactPercentage}
-              color="#d97706"
+              color="#dc2626"
             />
             <BarStat
               label="Birthdate"
               value={stats.birthdateEmployees}
               total={stats.totalEmployees}
               percentage={stats.birthdatePercentage}
-              color="#d97706"
+              color="#dc2626"
             />
             <BarStat
               label="Address (Home #, Brgy., City)"
               value={stats.addressEmployees}
               total={stats.totalEmployees}
               percentage={stats.addressPercentage}
-              color="#d97706"
+              color="#dc2626"
             />
           </div>
         </div>

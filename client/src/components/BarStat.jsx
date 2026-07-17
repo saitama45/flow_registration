@@ -5,7 +5,7 @@ import { useCountUp } from '../hooks/useCountUp.js';
  * percentage + raw count on the right. Used for the shared-details breakdown
  * and the not-vulnerable share on the dashboard.
  */
-export default function BarStat({ label, value = 0, total = 0, percentage = 0, color = '#d97706' }) {
+export default function BarStat({ label, value = 0, total = 0, percentage = 0, color = '#dc2626' }) {
   const clamped = Math.max(0, Math.min(100, percentage));
   const animated = useCountUp(clamped);
 

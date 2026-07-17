@@ -105,7 +105,7 @@ export default function EmployeeList() {
                   <td className="px-3 py-2.5 text-slate-500">{emp.venue}</td>
                   <td className="px-3 py-2.5 text-center">
                     {emp.vulnerable ? (
-                      <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                      <span className="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                         Yes
                       </span>
                     ) : (

@@ -69,19 +69,18 @@ export default function GaugeChart({ value = 0 }) {
           const a2 = angleForPct(zone.to);
           const mid = angleForPct((zone.from + zone.to) / 2);
           const pos = polar(mid, R_LABEL);
-          // Curve the label along the band: near-horizontal at the ends,
-          // near-vertical in the middle. Sign flips across the top.
-          const magnitude = 90 - Math.abs(mid - 90);
-          const rotation = (mid >= 90 ? -1 : 1) * magnitude;
+          // Labels sit upright at the middle of their band. Rotating them to
+          // follow the arc mirrors the text across the top (one half reads
+          // bottom-to-top, the other top-to-bottom), which reads as sloppy —
+          // upright text is legible everywhere with no head-tilting.
           return (
             <g key={zone.label}>
               <path d={zonePath(a1, a2)} fill={zone.color} />
               <text
                 x={pos.x}
                 y={pos.y}
-                transform={`rotate(${rotation} ${pos.x} ${pos.y})`}
                 textAnchor="middle"
-                dominantBaseline="middle"
+                dominantBaseline="central"
                 fill="#ffffff"
                 fontSize="6.5"
                 fontWeight="700"
