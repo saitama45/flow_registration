@@ -7,10 +7,14 @@ A privacy-first event registration app.
   the backend discards the raw values and stores only `Yes`/`No` flags
   indicating whether each was provided. Anyone who provided at least one of
   those fields is flagged as a **Vulnerable** employee.
-- **Dashboard** (`/dashboard`): realtime, animated — a full-width speedometer
-  gauge for the vulnerable percentage, a count-up total, a donut for the
-  vulnerable count, and a bar for the "asked if fields are required" share.
-  Aggregate counts only, no login step.
+- **Dashboard** (`/dashboard`): realtime, animated — a full-width risk gauge
+  for the exposure percentage, a count-up total, a donut for the vulnerable
+  count, per-field bars for which details were shared, and a bar for the
+  "asked if fields are required" share. Aggregate counts only, no login step.
+  At the bottom, a **registration QR code** with a "Download PDF for printing"
+  button: an A4 poster with the QR drawn as vectors (sharp at any size, ~20KB).
+  The QR target is `PUBLIC_REGISTRATION_URL` in `client/src/constants.js`
+  (override with `VITE_PUBLIC_URL`).
 - **Employee list** (`/employee_list`): realtime table of registrations with
   a per-row checkbox to flag anyone who asked whether the fields are required;
   that count feeds the dashboard.

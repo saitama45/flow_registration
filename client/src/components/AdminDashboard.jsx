@@ -7,6 +7,7 @@ import DonutRing from './DonutRing.jsx';
 import ProgressBar from './ProgressBar.jsx';
 import BarStat from './BarStat.jsx';
 import LiveBadge from './LiveBadge.jsx';
+import QrCodeCard from './QrCodeCard.jsx';
 
 /**
  * Realtime dashboard. Polls /api/stats every few seconds (no manual refresh)
@@ -158,6 +159,9 @@ export default function AdminDashboard() {
             </p>
           </div>
         </div>
+
+        {/* Shareable QR code for the public registration form */}
+        <QrCodeCard />
       </div>
     </div>
   );
