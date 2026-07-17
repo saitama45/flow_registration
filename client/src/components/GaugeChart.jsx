@@ -1,9 +1,14 @@
 import { useCountUp } from '../hooks/useCountUp.js';
+import { RISK_ALERT_THRESHOLD } from '../constants.js';
 
 /**
- * Animated speedometer gauge (0–100%). Five colored zones from "Very Poor"
- * (left) to "Excellent" (right); the needle rotates smoothly to the value
- * via a CSS transition, and the center percentage counts up.
+ * Animated risk gauge (0–100% of registrants who exposed personal data).
+ *
+ * The bands are risk levels, not a report-card grade: the metric measures
+ * privacy exposure, so it reads Minimal → Critical. Band edges are deliberate
+ * (not five equal fifths) so that RISK_ALERT_THRESHOLD is exactly where the
+ * wording turns to "Moderate" and the readout starts blinking — the label and
+ * the alarm always agree.
  */
 
 const CX = 100;
@@ -12,24 +17,23 @@ const R_OUTER = 92;
 const R_INNER = 60;
 const R_LABEL = 76;
 
-// Left→right: green → red. The needle is driven by the VULNERABLE percentage,
-// so at 0% vulnerable it rests far-left on "Excellent" and swings right toward
-// "Very Poor" as more vulnerable people register.
 const ZONES = [
-  { label: 'Excellent', color: '#43b04a' },
-  { label: 'Good', color: '#8bc34a' },
-  { label: 'Fair', color: '#f2c445' },
-  { label: 'Poor', color: '#f0722f' },
-  { label: 'Very Poor', color: '#e63329' },
+  { label: 'Minimal', from: 0, to: 15, color: '#43b04a' },
+  { label: 'Low', from: 15, to: RISK_ALERT_THRESHOLD, color: '#8bc34a' },
+  { label: 'Moderate', from: RISK_ALERT_THRESHOLD, to: 50, color: '#f2c445' },
+  { label: 'High', from: 50, to: 70, color: '#f0722f' },
+  { label: 'Critical', from: 70, to: 100, color: '#e63329' },
 ];
 
 // Gauge angle: 180° = left end (0%), 90° = top (50%), 0° = right end (100%).
+const angleForPct = (pct) => 180 - pct * 1.8;
+
 function polar(angleDeg, r) {
   const a = (angleDeg * Math.PI) / 180;
   return { x: CX + r * Math.cos(a), y: CY - r * Math.sin(a) };
 }
 
-// Filled wedge for one zone, between gauge angles a1 (larger) and a2 (smaller).
+// Filled wedge for one band, between gauge angles a1 (larger) and a2 (smaller).
 function zonePath(a1, a2) {
   const oStart = polar(a1, R_OUTER);
   const oEnd = polar(a2, R_OUTER);
@@ -44,17 +48,15 @@ function zonePath(a1, a2) {
   ].join(' ');
 }
 
-function ratingFor(pct) {
-  return ZONES[Math.min(ZONES.length - 1, Math.floor(pct / 20))].label;
+export function riskLevelFor(pct) {
+  const zone = ZONES.find((z) => pct >= z.from && pct < z.to);
+  return (zone || ZONES[ZONES.length - 1]).label;
 }
-
-// At/above this vulnerable share, the readout blinks as a warning.
-const BLINK_THRESHOLD = 33.3;
 
 export default function GaugeChart({ value = 0 }) {
   const clamped = Math.max(0, Math.min(100, value));
   const animated = useCountUp(clamped);
-  const isHigh = clamped >= BLINK_THRESHOLD;
+  const isHigh = clamped >= RISK_ALERT_THRESHOLD;
 
   // Needle points up at 0° rotation; map 0%→-90° (left) … 100%→+90° (right).
   const needleRotation = clamped * 1.8 - 90;
@@ -62,10 +64,10 @@ export default function GaugeChart({ value = 0 }) {
   return (
     <div className="flex flex-col items-center">
       <svg viewBox="0 0 200 130" className="w-full max-w-sm" role="img" aria-label={`${clamped}%`}>
-        {ZONES.map((zone, i) => {
-          const a1 = 180 - i * 36;
-          const a2 = 180 - (i + 1) * 36;
-          const mid = (a1 + a2) / 2;
+        {ZONES.map((zone) => {
+          const a1 = angleForPct(zone.from);
+          const a2 = angleForPct(zone.to);
+          const mid = angleForPct((zone.from + zone.to) / 2);
           const pos = polar(mid, R_LABEL);
           // Curve the label along the band: near-horizontal at the ends,
           // near-vertical in the middle. Sign flips across the top.
@@ -81,7 +83,7 @@ export default function GaugeChart({ value = 0 }) {
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fill="#ffffff"
-                fontSize="7"
+                fontSize="6.5"
                 fontWeight="700"
               >
                 {zone.label}
@@ -108,8 +110,12 @@ export default function GaugeChart({ value = 0 }) {
         >
           {animated.toFixed(1)}%
         </div>
-        <div className={`text-xs font-medium ${isHigh ? 'animate-vuln-blink' : 'text-slate-500'}`}>
-          {ratingFor(clamped)}
+        <div
+          className={`text-xs font-bold uppercase tracking-wide ${
+            isHigh ? 'animate-vuln-blink' : 'text-slate-500'
+          }`}
+        >
+          {riskLevelFor(clamped)}
         </div>
       </div>
     </div>

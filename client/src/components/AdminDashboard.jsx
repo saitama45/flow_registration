@@ -1,4 +1,5 @@
 import { fetchStats } from '../api.js';
+import { RISK_ALERT_THRESHOLD } from '../constants.js';
 import { usePolling } from '../hooks/usePolling.js';
 import { useCountUp } from '../hooks/useCountUp.js';
 import GaugeChart from './GaugeChart.jsx';
@@ -55,10 +56,28 @@ export default function AdminDashboard() {
       )}
 
       <div className="mt-6 space-y-5">
-        {/* Vulnerable percentage — full-width hero gauge */}
+        {/* Exposure risk — full-width hero gauge */}
         <div className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-slate-50 px-4 py-8 text-center ring-1 ring-slate-100">
           <GaugeChart value={stats.vulnerablePercentage} />
-          <span className="text-sm font-medium text-slate-500">Vulnerable Percentages</span>
+          <span className="text-sm font-medium text-slate-500">Data Exposure Risk</span>
+
+          {/* Spell out the risk in words once it crosses the alert threshold,
+              so the blinking number is never the only signal. */}
+          {stats.vulnerablePercentage >= RISK_ALERT_THRESHOLD && (
+            <p className="mt-2 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+              <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0" aria-hidden="true">
+                <path
+                  d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {stats.vulnerableEmployees} of {stats.totalEmployees} registrants exposed personal
+              data
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
