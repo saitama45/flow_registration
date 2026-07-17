@@ -163,10 +163,22 @@ failure. The three vulnerable values are discarded server-side.
   "totalEmployees": 42,
   "vulnerableEmployees": 10,
   "vulnerablePercentage": 23.8,
+  "notVulnerableEmployees": 32,
+  "notVulnerablePercentage": 76.2,
   "askedEmployees": 6,
-  "askedPercentage": 14.3
+  "askedPercentage": 14.3,
+  "contactEmployees": 9,
+  "contactPercentage": 21.4,
+  "birthdateEmployees": 5,
+  "birthdatePercentage": 11.9,
+  "addressEmployees": 3,
+  "addressPercentage": 7.1
 }
 ```
+
+The `contact` / `birthdate` / `address` counts are per-field breakdowns of who
+chose to share each optional detail (from the Yes/No flags — the values
+themselves are never stored). The dashboard renders them as bar graphs.
 
 ### `GET /api/employees`
 

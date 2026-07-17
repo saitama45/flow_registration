@@ -4,6 +4,7 @@ import { useCountUp } from '../hooks/useCountUp.js';
 import GaugeChart from './GaugeChart.jsx';
 import DonutRing from './DonutRing.jsx';
 import ProgressBar from './ProgressBar.jsx';
+import BarStat from './BarStat.jsx';
 import LiveBadge from './LiveBadge.jsx';
 
 /**
@@ -23,8 +24,16 @@ export default function AdminDashboard() {
     totalEmployees: 0,
     vulnerableEmployees: 0,
     vulnerablePercentage: 0,
+    notVulnerableEmployees: 0,
+    notVulnerablePercentage: 0,
     askedEmployees: 0,
     askedPercentage: 0,
+    contactEmployees: 0,
+    contactPercentage: 0,
+    birthdateEmployees: 0,
+    birthdatePercentage: 0,
+    addressEmployees: 0,
+    addressPercentage: 0,
   };
 
   const animatedTotal = useCountUp(stats.totalEmployees);
@@ -70,6 +79,53 @@ export default function AdminDashboard() {
               centerLabel={`of ${stats.totalEmployees}`}
             />
             <span className="text-sm font-medium text-slate-500">Vulnerable employees</span>
+          </div>
+        </div>
+
+        {/* Which optional details people chose to share — one bar per field.
+            Same measure across three categories, so they share one colour. */}
+        <div className="rounded-2xl bg-slate-50 px-6 py-6 ring-1 ring-amber-100">
+          <p className="text-sm font-semibold text-slate-700">Employees who shared their…</p>
+          <p className="mt-0.5 text-xs text-slate-400">
+            Only whether each was provided is recorded — never the values.
+          </p>
+          <div className="mt-4 space-y-4">
+            <BarStat
+              label="Contact Number"
+              value={stats.contactEmployees}
+              total={stats.totalEmployees}
+              percentage={stats.contactPercentage}
+              color="#d97706"
+            />
+            <BarStat
+              label="Birthdate"
+              value={stats.birthdateEmployees}
+              total={stats.totalEmployees}
+              percentage={stats.birthdatePercentage}
+              color="#d97706"
+            />
+            <BarStat
+              label="Address (Home #, Brgy., City)"
+              value={stats.addressEmployees}
+              total={stats.totalEmployees}
+              percentage={stats.addressPercentage}
+              color="#d97706"
+            />
+          </div>
+        </div>
+
+        {/* Not-vulnerable share — green, since sharing nothing is the good case. */}
+        <div className="rounded-2xl bg-slate-50 px-6 py-6 ring-1 ring-green-100">
+          <p className="text-sm font-semibold text-slate-700">Employees who are not vulnerable</p>
+          <p className="mt-0.5 text-xs text-slate-400">Shared none of the three details above.</p>
+          <div className="mt-4">
+            <BarStat
+              label="Not vulnerable"
+              value={stats.notVulnerableEmployees}
+              total={stats.totalEmployees}
+              percentage={stats.notVulnerablePercentage}
+              color="#43b04a"
+            />
           </div>
         </div>
 

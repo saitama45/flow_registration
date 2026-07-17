@@ -148,8 +148,14 @@ async function getStats() {
   const rows = await getRows();
   const totalEmployees = rows.length;
 
-  const vulnerableEmployees = rows.filter((r) => isYes(r[COL.vulnerable])).length;
-  const askedEmployees = rows.filter((r) => isYes(r[COL.asked])).length;
+  const countYes = (col) => rows.filter((r) => isYes(r[col])).length;
+
+  const vulnerableEmployees = countYes(COL.vulnerable);
+  const askedEmployees = countYes(COL.asked);
+  const contactEmployees = countYes(COL.providedContact);
+  const birthdateEmployees = countYes(COL.providedBirthdate);
+  const addressEmployees = countYes(COL.providedAddress);
+  const notVulnerableEmployees = totalEmployees - vulnerableEmployees;
 
   const pct = (n) =>
     totalEmployees === 0 ? 0 : Math.round((n / totalEmployees) * 1000) / 10;
@@ -158,8 +164,18 @@ async function getStats() {
     totalEmployees,
     vulnerableEmployees,
     vulnerablePercentage: pct(vulnerableEmployees),
+    notVulnerableEmployees,
+    notVulnerablePercentage: pct(notVulnerableEmployees),
     askedEmployees,
     askedPercentage: pct(askedEmployees),
+    // Per-field breakdown of which optional details people chose to share.
+    // (Only the Yes/No flags exist in the sheet — never the values.)
+    contactEmployees,
+    contactPercentage: pct(contactEmployees),
+    birthdateEmployees,
+    birthdatePercentage: pct(birthdateEmployees),
+    addressEmployees,
+    addressPercentage: pct(addressEmployees),
   };
 }
 
