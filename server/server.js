@@ -36,6 +36,12 @@ const {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Render (and most hosts) put the app behind a reverse proxy. Without this,
+// req.ip is the PROXY's address for every visitor, so all of them share a
+// single rate-limit bucket and real attendees start getting blocked. Trust
+// exactly one hop — `true` would let clients spoof X-Forwarded-For.
+app.set('trust proxy', 1);
+
 // ---- Global hardening ------------------------------------------------
 // CSP tuned for the built React SPA this server also serves: same-origin
 // scripts/styles/images only (plus inline styles, which Vite may emit, and
@@ -91,11 +97,13 @@ app.use(
   })
 );
 
-// Stricter limit for the write endpoints (register + asked-toggle), which is
-// where abuse actually matters.
+// Registration limit. This must be generous: at a live event everyone on the
+// venue WiFi shares ONE public IP (NAT), so a low per-IP cap blocks genuine
+// attendees the moment a queue forms. Spam is already handled by the honeypot
+// and field validation; this is only a backstop against a runaway script.
 const registerLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 500,
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, message: 'Too many registrations from this IP. Try again later.' },

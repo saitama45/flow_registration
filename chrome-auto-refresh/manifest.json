@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Flow Registration Auto Refresh",
+  "version": "1.0.0",
+  "description": "Refreshes the Flow Registration page once every minute.",
+  "permissions": [
+    "alarms",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://flow-registration.onrender.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Toggle Flow Registration auto-refresh"
+  }
+}

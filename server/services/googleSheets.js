@@ -54,6 +54,12 @@ const spreadsheetId = () => process.env.GOOGLE_SPREADSHEET_ID;
 
 const isYes = (v) => (v || '').trim().toLowerCase() === 'yes';
 
+// A row counts as a real registration only if it actually holds something.
+// Google Sheets pads its response with blank rows whenever the sheet has gaps
+// (an append can land far below the last record, leaving hundreds of empty
+// rows in between), and those blanks must never be counted as employees.
+const isRealRow = (r) => Array.isArray(r) && r.some((cell) => (cell || '').trim() !== '');
+
 /**
  * Human-readable timestamp for the spreadsheet, e.g. "Jul 15, 2026, 3:21 PM".
  * Fixed to Asia/Manila and en-US formatting so every row reads the same
@@ -145,7 +151,7 @@ async function getRows() {
  * underlying rows.
  */
 async function getStats() {
-  const rows = await getRows();
+  const rows = (await getRows()).filter(isRealRow);
   const totalEmployees = rows.length;
 
   const countYes = (col) => rows.filter((r) => isYes(r[col])).length;
@@ -187,16 +193,21 @@ async function getStats() {
  */
 async function listEmployees() {
   const rows = await getRows();
-  return rows.map((r, i) => ({
-    row: i + 2, // sheet row number (row 1 is the header)
-    timestamp: r[COL.timestamp] || '',
-    employeeId: r[COL.employeeId] || '',
-    fullName: r[COL.fullName] || '',
-    nickname: r[COL.nickname] || '',
-    venue: r[COL.venue] || '',
-    vulnerable: isYes(r[COL.vulnerable]),
-    asked: isYes(r[COL.asked]),
-  }));
+  // Map first so each record keeps its true spreadsheet row number (needed to
+  // write the "asked" flag back), then drop the blank filler rows.
+  return rows
+    .map((r, i) => ({ r, row: i + 2 })) // sheet row number (row 1 is the header)
+    .filter(({ r }) => isRealRow(r))
+    .map(({ r, row }) => ({
+      row,
+      timestamp: r[COL.timestamp] || '',
+      employeeId: r[COL.employeeId] || '',
+      fullName: r[COL.fullName] || '',
+      nickname: r[COL.nickname] || '',
+      venue: r[COL.venue] || '',
+      vulnerable: isYes(r[COL.vulnerable]),
+      asked: isYes(r[COL.asked]),
+    }));
 }
 
 /**
